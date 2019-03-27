@@ -29,8 +29,8 @@ void MainWindow::restore(int maN)
 {
   auto lineOut = new QLineSeries();
   lineOut->setColor(Qt::green);
-  auto lineMed = new QLineSeries();
-  lineMed->setColor(Qt::red);
+  auto lineErr = new QLineSeries();
+  lineErr->setColor(Qt::red);
 
   for (int i = 0; i < N * 2; i++)
     {
@@ -43,8 +43,10 @@ void MainWindow::restore(int maN)
 
       lineOut->append(i, y);
 
-      if (i != 0 && i < N)
-        { lineMed->append(i, (in[i] + in[i - 1]) / 2); }
+      if (i < N)
+        {
+          lineErr->append(i, y - in[i]);
+        }
     }
 
   auto l1 = ui->ch1->chart()->series()[0];
@@ -52,7 +54,7 @@ void MainWindow::restore(int maN)
   ui->ch1->chart()->removeAllSeries();
   ui->ch1->chart()->addSeries(l1);
   ui->ch1->chart()->addSeries(lineOut);
-  ui->ch1->chart()->addSeries(lineMed);
+  ui->ch1->chart()->addSeries(lineErr);
   ui->ch1->chart()->createDefaultAxes();
   ui->progress->setValue(maN);
 }
@@ -96,7 +98,7 @@ void MainWindow::on_pushButton_clicked()
   ui->kfsss->clear();
   QString result, format;
   format = "k = %1, w = %2, ph = %3\n";
-  count = QRandomGenerator::global()->bounded(1, N);
+  count = QRandomGenerator::global()->bounded(1, 10);
   result = QString::number(count);
   result += '\n';
 
@@ -179,6 +181,7 @@ double MainWindow::f(QDate date)
 bool MainWindow::periodic(int x)
 {
   return false
+         //         || x < N / 3
          || x == N / 2
          || x == N / 15
          || x == N / (7 / 2)
@@ -197,7 +200,7 @@ bool MainWindow::periodic(int x)
          || x == N / (30 * 3)
          || x == N / (30 * 4)
          || x == N / (30 * 6)
-         //         || true
+         || true
          ;
 }
 
