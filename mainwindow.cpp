@@ -77,7 +77,7 @@ void MainWindow::restoreKKK(int maN)
       balance += y;
       lineOut->append(i, balance);
 
-      if (i == N)
+      if (i == N + 2)
         { ui->tlout->setText(QString::number(y, 'f', 2)); }
     }
 
@@ -136,7 +136,7 @@ void MainWindow::on_pushButton_2_clicked()
       double sumreal = 0;
       double sumimag = 0;
 
-      if (periodic(k))
+      if (k == 0 || periodic(k))
         {
           for (int t = 0; t < N; t++) // For each input element
             {
@@ -180,8 +180,7 @@ double MainWindow::f(QDate date)
 
 bool MainWindow::periodic(int x)
 {
-  return false
-         //         || true
+  return ui->all->isChecked()
          || x == 1
          || x == 12
          || x == round(1.0 * N / 10)
@@ -192,37 +191,20 @@ bool MainWindow::periodic(int x)
          || x == round(1.0 * N / (7 * 3))
          || x == round(1.0 * N / (7 * 4))
          || x == round(1.0 * N / (7 * 6))
-         || x == round(1.0 * N / (5.0 / 2))
-         || x == round(1.0 * N / 5)
-         || x == round(1.0 * N / (5 * 2))
-         || x == round(1.0 * N / (5 * 3))
-         || x == round(1.0 * N / (5 * 4))
-         || x == round(1.0 * N / (5 * 6))
+         || x == round(1.0 * N / (7 * 8))
+         || x == round(1.0 * N / (7 * 12))
+         || x == round(1.0 * N / (7 * 16))
+         || x == round(1.0 * N / (7 * 24))
          || x == round(1.0 * N / (365.0 / 12))
          || x == round(1.0 * N / (365.0 / 12 * 2))
          || x == round(1.0 * N / (365.0 / 12 * 3))
          || x == round(1.0 * N / (365.0 / 12 * 4))
          || x == round(1.0 * N / (365.0 / 12 * 6))
-         || x == round(1.0 * N / 30)
-         || x == round(1.0 * N / (30.0 * 2))
-         || x == round(1.0 * N / (30.0 * 3))
-         || x == round(1.0 * N / (30.0 * 4))
-         || x == round(1.0 * N / (30.0 * 6))
-         || x == round(1.0 * N / (365.0 / 12 * 5 / 7))
-         || x == round(1.0 * N / (365.0 / 12 * 2 * 5 / 7))
-         || x == round(1.0 * N / (365.0 / 12 * 3 * 5 / 7))
-         || x == round(1.0 * N / (365.0 / 12 * 4 * 5 / 7))
-         || x == round(1.0 * N / (365.0 / 12 * 6 * 5 / 7))
-         || x == round(1.0 * N / (30.0 * 5 / 7))
-         || x == round(1.0 * N / (30.0 * 2 * 5 / 7))
-         || x == round(1.0 * N / (30.0 * 3 * 5 / 7))
-         || x == round(1.0 * N / (30.0 * 4 * 5 / 7))
-         || x == round(1.0 * N / (30.0 * 6 * 5 / 7))
-         || x == round(1.0 * N / (291.0 / 12))
-         || x == round(1.0 * N / (291.0 / 12 * 2))
-         || x == round(1.0 * N / (291.0 / 12 * 3))
-         || x == round(1.0 * N / (291.0 / 12 * 4))
-         || x == round(1.0 * N / (291.0 / 12 * 6))
+         //         || x == round(1.0 * N / 30)
+         //         || x == round(1.0 * N / (30.0 * 2))
+         //         || x == round(1.0 * N / (30.0 * 3))
+         //         || x == round(1.0 * N / (30.0 * 4))
+         //         || x == round(1.0 * N / (30.0 * 6))
          ;
 }
 
@@ -268,6 +250,7 @@ void MainWindow::on_pushButton_3_clicked()
         }
 
       QList<int> values = freqs.values();
+      QString aba;
       std::sort(values.rbegin(), values.rend());
       double v0 = freqs.key(values[0]);
       double v1 = freqs.key(values[1]);
@@ -275,6 +258,7 @@ void MainWindow::on_pushButton_3_clicked()
       double v3 = freqs.key(values[3]);
       double v4 = freqs.key(values[4]);
       ds.seek(0);
+      int minfreq = ui->minFreq->value();
 
       while (ds.readLineInto(&line))
         {
@@ -297,12 +281,11 @@ void MainWindow::on_pushButton_3_clicked()
               || value == v4
               || true
              )
-
-            //            if (freqs[value] > 100)
-            if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
-              {
-                transactions[date] += value;
-              }
+            if (freqs[value] >= minfreq)
+              if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
+                {
+                  transactions[date] += value;
+                }
         }
     }
 
@@ -319,29 +302,6 @@ void MainWindow::on_pushButton_3_clicked()
       result += format.arg(begin.addDays(i).toString()).arg(f(begin.addDays(i)));
     }
 
-  //  QList<QDate> keys = transactions.keys();
-  //  int c = keys.count();
-  //  N = c;
-  //  for (int i = 0; i < N; i++)
-  //    {
-  //      in.append(transactions[keys[i]]);
-  //    }
-  //  QVector<double> in2(in);
-  //  const int abacaba = 1;
-  //  for (int i = abacaba / 2; i < in.size() - abacaba / 2; i++)
-  //    {
-  //      in[i] = 0;
-  //      for (int j = 0; j < abacaba; j++)
-  //        {
-  //          in[i] += in2[i + j - abacaba / 2];
-  //        }
-  //      in[i] /= abacaba;
-  //    }
-  //  for (int i = 0; i < N; i++)
-  //    {
-  //      lineIn->append(i, in[i]);
-  //      result += format.arg(i).arg(in[i]);
-  //    }
   ui->kfsss->appendPlainText(result);
   ui->ch1->chart()->addSeries(lineIn);
   ui->ch1->chart()->createDefaultAxes();
@@ -349,6 +309,7 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::on_pushButton_4_clicked()
 {
+  lastKKK = false;
   ttt->stop();
   ui->progress->setMaximum(N / 2);
   restore(N / 2);
@@ -382,6 +343,7 @@ void MainWindow::onTimer2()
 
 void MainWindow::on_pushButton_5_clicked()
 {
+  lastKKK = false;
   currN = 2;
   ttt->start(50);
   ui->progress->setMaximum(N / 2);
@@ -389,6 +351,7 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_6_clicked()
 {
+  lastKKK = true;
   kkk->stop();
   ui->progress->setMaximum(N / 2);
   restoreKKK(N / 2);
@@ -396,7 +359,16 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::on_pushButton_7_clicked()
 {
+  lastKKK = true;
   currN = 2;
   kkk->start(50);
   ui->progress->setMaximum(N / 2);
+}
+
+void MainWindow::on_progress_valueChanged(int value)
+{
+  if (lastKKK)
+    { restoreKKK(value); }
+  else
+    { restore(value); }
 }

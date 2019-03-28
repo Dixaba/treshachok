@@ -29,8 +29,8 @@ class MainWindow : public QMainWindow {
     void onTimer2();
     void on_pushButton_5_clicked();
     void on_pushButton_6_clicked();
-
     void on_pushButton_7_clicked();
+    void on_progress_valueChanged(int value);
 
   private:
     Ui::MainWindow *ui;
@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow {
     double f(QDate date);
     bool periodic(int x);
 
+    bool lastKKK;
     int N = 1000;
     int currN, count;
     QVector<double> in;
