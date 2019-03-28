@@ -181,26 +181,48 @@ double MainWindow::f(QDate date)
 bool MainWindow::periodic(int x)
 {
   return false
-         || x < N / 3
-         || x == N / 2
-         || x == N / 15
-         || x == N / (7 / 2)
-         || x == N / 7
-         || x == N / (7 * 2)
-         || x == N / (7 * 3)
-         || x == N / (7 * 4)
-         || x == N / (7 * 6)
-         || x == N / (365 / 12)
-         || x == N / (365 / 12 * 2)
-         || x == N / (365 / 12 * 3)
-         || x == N / (365 / 12 * 4)
-         || x == N / (365 / 12 * 6)
-         || x == N / 30
-         || x == N / (30 * 2)
-         || x == N / (30 * 3)
-         || x == N / (30 * 4)
-         || x == N / (30 * 6)
          //         || true
+         || x == 1
+         || x == 12
+         || x == round(1.0 * N / 10)
+         || x == round(1.0 * N / 15)
+         || x == round(1.0 * N / (7.0 / 2))
+         || x == round(1.0 * N / 7)
+         || x == round(1.0 * N / (7 * 2))
+         || x == round(1.0 * N / (7 * 3))
+         || x == round(1.0 * N / (7 * 4))
+         || x == round(1.0 * N / (7 * 6))
+         || x == round(1.0 * N / (5.0 / 2))
+         || x == round(1.0 * N / 5)
+         || x == round(1.0 * N / (5 * 2))
+         || x == round(1.0 * N / (5 * 3))
+         || x == round(1.0 * N / (5 * 4))
+         || x == round(1.0 * N / (5 * 6))
+         || x == round(1.0 * N / (365.0 / 12))
+         || x == round(1.0 * N / (365.0 / 12 * 2))
+         || x == round(1.0 * N / (365.0 / 12 * 3))
+         || x == round(1.0 * N / (365.0 / 12 * 4))
+         || x == round(1.0 * N / (365.0 / 12 * 6))
+         || x == round(1.0 * N / 30)
+         || x == round(1.0 * N / (30.0 * 2))
+         || x == round(1.0 * N / (30.0 * 3))
+         || x == round(1.0 * N / (30.0 * 4))
+         || x == round(1.0 * N / (30.0 * 6))
+         || x == round(1.0 * N / (365.0 / 12 * 5 / 7))
+         || x == round(1.0 * N / (365.0 / 12 * 2 * 5 / 7))
+         || x == round(1.0 * N / (365.0 / 12 * 3 * 5 / 7))
+         || x == round(1.0 * N / (365.0 / 12 * 4 * 5 / 7))
+         || x == round(1.0 * N / (365.0 / 12 * 6 * 5 / 7))
+         || x == round(1.0 * N / (30.0 * 5 / 7))
+         || x == round(1.0 * N / (30.0 * 2 * 5 / 7))
+         || x == round(1.0 * N / (30.0 * 3 * 5 / 7))
+         || x == round(1.0 * N / (30.0 * 4 * 5 / 7))
+         || x == round(1.0 * N / (30.0 * 6 * 5 / 7))
+         || x == round(1.0 * N / (291.0 / 12))
+         || x == round(1.0 * N / (291.0 / 12 * 2))
+         || x == round(1.0 * N / (291.0 / 12 * 3))
+         || x == round(1.0 * N / (291.0 / 12 * 4))
+         || x == round(1.0 * N / (291.0 / 12 * 6))
          ;
 }
 
@@ -267,7 +289,16 @@ void MainWindow::on_pushButton_3_clicked()
           if (tokens[2] == "2")
             { value = -value; }
 
-          if (value == v0 || value == v1 || value == v2 || value == v3 || value == v4)
+          if (false
+              || value == v0
+              || value == v1
+              || value == v2
+              || value == v3
+              || value == v4
+              || true
+             )
+
+            //            if (freqs[value] > 100)
             if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
               {
                 transactions[date] += value;
@@ -288,6 +319,29 @@ void MainWindow::on_pushButton_3_clicked()
       result += format.arg(begin.addDays(i).toString()).arg(f(begin.addDays(i)));
     }
 
+  //  QList<QDate> keys = transactions.keys();
+  //  int c = keys.count();
+  //  N = c;
+  //  for (int i = 0; i < N; i++)
+  //    {
+  //      in.append(transactions[keys[i]]);
+  //    }
+  //  QVector<double> in2(in);
+  //  const int abacaba = 1;
+  //  for (int i = abacaba / 2; i < in.size() - abacaba / 2; i++)
+  //    {
+  //      in[i] = 0;
+  //      for (int j = 0; j < abacaba; j++)
+  //        {
+  //          in[i] += in2[i + j - abacaba / 2];
+  //        }
+  //      in[i] /= abacaba;
+  //    }
+  //  for (int i = 0; i < N; i++)
+  //    {
+  //      lineIn->append(i, in[i]);
+  //      result += format.arg(i).arg(in[i]);
+  //    }
   ui->kfsss->appendPlainText(result);
   ui->ch1->chart()->addSeries(lineIn);
   ui->ch1->chart()->createDefaultAxes();
