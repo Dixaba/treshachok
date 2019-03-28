@@ -77,7 +77,7 @@ void MainWindow::restoreKKK(int maN)
       balance += y;
       lineOut->append(i, balance);
 
-      if (i == N + 2)
+      if (i == N)
         { ui->tlout->setText(QString::number(y, 'f', 2)); }
     }
 
@@ -182,7 +182,6 @@ bool MainWindow::periodic(int x)
 {
   return ui->all->isChecked()
          || x == 1
-         || x == 12
          || x == round(1.0 * N / 10)
          || x == round(1.0 * N / 15)
          || x == round(1.0 * N / (7.0 / 2))
@@ -200,11 +199,6 @@ bool MainWindow::periodic(int x)
          || x == round(1.0 * N / (365.0 / 12 * 3))
          || x == round(1.0 * N / (365.0 / 12 * 4))
          || x == round(1.0 * N / (365.0 / 12 * 6))
-         //         || x == round(1.0 * N / 30)
-         //         || x == round(1.0 * N / (30.0 * 2))
-         //         || x == round(1.0 * N / (30.0 * 3))
-         //         || x == round(1.0 * N / (30.0 * 4))
-         //         || x == round(1.0 * N / (30.0 * 6))
          ;
 }
 
