@@ -181,7 +181,7 @@ double MainWindow::f(QDate date)
 bool MainWindow::periodic(int x)
 {
   return false
-         //         || x < N / 3
+         || x < N / 3
          || x == N / 2
          || x == N / 15
          || x == N / (7 / 2)
@@ -200,7 +200,7 @@ bool MainWindow::periodic(int x)
          || x == N / (30 * 3)
          || x == N / (30 * 4)
          || x == N / (30 * 6)
-         || true
+         //         || true
          ;
 }
 
@@ -209,6 +209,7 @@ void MainWindow::on_pushButton_3_clicked()
   ui->ch1->chart()->removeAllSeries();
   ui->kfsss->clear();
   transactions.clear();
+  freqs.clear();
   QString result, format;
   format = "d = %1, a = %2\n";
   QFile data("a.csv");
@@ -219,8 +220,39 @@ void MainWindow::on_pushButton_3_clicked()
     {
       QTextStream ds(&data);
       QString line;
-      ds.readLineInto(&line);
       in.clear();
+      int trcount = 0;
+
+      while (ds.readLineInto(&line))
+        {
+          trcount++;
+          QStringList tokens = line.split(',');
+          double value = tokens[0].toDouble();
+
+          if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
+            {
+              if (tokens[2] == "2")
+                { value = -value; }
+
+              if (!freqs.contains(value))
+                {
+                  freqs[value] = 1;
+                }
+              else
+                {
+                  freqs[value] += 1;
+                }
+            }
+        }
+
+      QList<int> values = freqs.values();
+      std::sort(values.rbegin(), values.rend());
+      double v0 = freqs.key(values[0]);
+      double v1 = freqs.key(values[1]);
+      double v2 = freqs.key(values[2]);
+      double v3 = freqs.key(values[3]);
+      double v4 = freqs.key(values[4]);
+      ds.seek(0);
 
       while (ds.readLineInto(&line))
         {
@@ -230,15 +262,16 @@ void MainWindow::on_pushButton_3_clicked()
           if (!transactions.contains(date))
             { transactions[date] = 0; }
 
-          if (plus && tokens[2] == "1")
-            {
-              transactions[date] += tokens[0].toDouble();
-            }
+          double value = tokens[0].toDouble();
 
-          if (minus && tokens[2] == "2")
-            {
-              transactions[date] -= tokens[0].toDouble();
-            }
+          if (tokens[2] == "2")
+            { value = -value; }
+
+          if (value == v0 || value == v1 || value == v2 || value == v3 || value == v4)
+            if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
+              {
+                transactions[date] += value;
+              }
         }
     }
 

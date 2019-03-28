@@ -47,6 +47,7 @@ class MainWindow : public QMainWindow {
     QVector<double> koefs;
     QVector<double> phases;
     QMap<QDate, double> transactions;
+    QMap<double, int> freqs;
     QTimer *ttt;
     QTimer *kkk;
 
