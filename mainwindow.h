@@ -31,6 +31,12 @@ class MainWindow : public QMainWindow {
     void on_pushButton_6_clicked();
     void on_pushButton_7_clicked();
     void on_progress_valueChanged(int value);
+    void on_pushButton_8_clicked();
+    void on_pushButton_9_clicked();
+
+    void on_pushButton_10_clicked();
+
+    void on_pushButton_11_clicked();
 
   private:
     Ui::MainWindow *ui;
@@ -38,6 +44,7 @@ class MainWindow : public QMainWindow {
     double f(double x);
     double f(QDate date);
     bool periodic(int x);
+    bool periodic2(int x);
 
     bool lastKKK;
     int N = 1000;

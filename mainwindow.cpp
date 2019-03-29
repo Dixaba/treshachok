@@ -6,6 +6,21 @@
 #include <QtMath>
 #include <QRandomGenerator>
 
+
+
+
+QList<double>weights;
+QList<double>val;
+int offset = 0;
+double expected, pred, err;
+int inputs;
+double eps;
+double speed;
+double step;
+
+
+
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
@@ -78,7 +93,7 @@ void MainWindow::restoreKKK(int maN)
       lineOut->append(i, balance);
 
       if (i == N)
-        { ui->tlout->setText(QString::number(y, 'f', 2)); }
+        { ui->tlout->setText(QString::number((int)y)); }
     }
 
   ui->ch1->chart()->removeAllSeries();
@@ -180,6 +195,7 @@ double MainWindow::f(QDate date)
 
 bool MainWindow::periodic(int x)
 {
+  int ms = N / 30.41;
   return ui->all->isChecked()
          || x == 1
          || x == round(1.0 * N / 10)
@@ -194,11 +210,28 @@ bool MainWindow::periodic(int x)
          || x == round(1.0 * N / (7 * 12))
          || x == round(1.0 * N / (7 * 16))
          || x == round(1.0 * N / (7 * 24))
-         || x == round(1.0 * N / (365.0 / 12))
-         || x == round(1.0 * N / (365.0 / 12 * 2))
-         || x == round(1.0 * N / (365.0 / 12 * 3))
-         || x == round(1.0 * N / (365.0 / 12 * 4))
-         || x == round(1.0 * N / (365.0 / 12 * 6))
+         || x == round(1.0 * N / (365.0 / ms))
+         || x == round(1.0 * N / (365.0 / ms * 2))
+         || x == round(1.0 * N / (365.0 / ms * 3))
+         || x == round(1.0 * N / (365.0 / ms * 4))
+         || x == round(1.0 * N / (365.0 / ms * 6))
+         ;
+}
+
+bool MainWindow::periodic2(int x)
+{
+  return ui->all->isChecked()
+         || x == 1
+         || x == round(1.0 * N / (7.0 / 2))
+         || x == round(1.0 * N / 7)
+         || x == round(1.0 * N / (7 * 2))
+         //         || x == round(1.0 * N / (7 * 3))
+         //         || x == round(1.0 * N / (7 * 4))
+         //         || x == round(1.0 * N / (7 * 6))
+         //         || x == round(1.0 * N / (7 * 8))
+         //         || x == round(1.0 * N / (7 * 12))
+         //         || x == round(1.0 * N / (7 * 16))
+         //         || x == round(1.0 * N / (7 * 24))
          ;
 }
 
@@ -243,14 +276,6 @@ void MainWindow::on_pushButton_3_clicked()
             }
         }
 
-      QList<int> values = freqs.values();
-      QString aba;
-      std::sort(values.rbegin(), values.rend());
-      double v0 = freqs.key(values[0]);
-      double v1 = freqs.key(values[1]);
-      double v2 = freqs.key(values[2]);
-      double v3 = freqs.key(values[3]);
-      double v4 = freqs.key(values[4]);
       ds.seek(0);
       int minfreq = ui->minFreq->value();
 
@@ -267,19 +292,11 @@ void MainWindow::on_pushButton_3_clicked()
           if (tokens[2] == "2")
             { value = -value; }
 
-          if (false
-              || value == v0
-              || value == v1
-              || value == v2
-              || value == v3
-              || value == v4
-              || true
-             )
-            if (freqs[value] >= minfreq)
-              if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
-                {
-                  transactions[date] += value;
-                }
+          if (freqs[value] >= minfreq)
+            if ((plus && tokens[2] == "1") || (minus && tokens[2] == "2"))
+              {
+                transactions[date] += value;
+              }
         }
     }
 
@@ -292,8 +309,8 @@ void MainWindow::on_pushButton_3_clicked()
   for (int i = 0; i < N; i++)
     {
       in.append(f(begin.addDays(i)));
-      lineIn->append(i, f(begin.addDays(i)));
-      result += format.arg(begin.addDays(i).toString()).arg(f(begin.addDays(i)));
+      lineIn->append(i, in.last());
+      result += format.arg(begin.addDays(i).toString()).arg(in.last());
     }
 
   ui->kfsss->appendPlainText(result);
@@ -365,4 +382,164 @@ void MainWindow::on_progress_valueChanged(int value)
     { restoreKKK(value); }
   else
     { restore(value); }
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+  const int period = 28;
+  QVector<double> compressed(period);
+  int ps = N / period;
+
+  for (int prd = ps - 1; prd >= 0; prd--)
+    {
+      for (int day = period - 1; day >= 0; day--)
+        {
+          int pos = N - ps * period + day + prd * period;
+          compressed[day] += in[pos];
+        }
+    }
+
+  N = period;
+
+  for (int i = 0; i < N; i++)
+    {
+      compressed[i] /= ps;
+    }
+
+  in = compressed;
+  ui->ch1->chart()->removeAllSeries();
+  auto lineIn = new QLineSeries();
+  lineIn->setColor(Qt::blue);
+  QString result, format;
+  format = "d = %1, a = %2\n";
+
+  for (int i = 0; i < N; i++)
+    {
+      lineIn->append(i, in[i]);
+      result += format.arg(i).arg(in[i]);
+    }
+
+  ui->kfsss->appendPlainText(result);
+  ui->ch1->chart()->addSeries(lineIn);
+  ui->ch1->chart()->createDefaultAxes();
+}
+
+void MainWindow::on_pushButton_9_clicked()
+{
+  out.clear();
+  ui->text->clear();
+  QString result, format;
+  format = "i = %1, mag = %2, ph = %3\n";
+
+  for (int k = 0; k < N / 2; k++) // For each output element
+    {
+      double sumreal = 0;
+      double sumimag = 0;
+
+      if (k == 0 || periodic2(k))
+        {
+          for (int t = 0; t < N; t++) // For each input element
+            {
+              double angle = 2 * M_PI * t * k / N;
+              sumreal += in[t] * qCos(angle);
+              sumimag += -in[t] * qSin(angle);
+            }
+        }
+
+      double mag = sqrt(pow(sumreal, 2) + pow(sumimag, 2)) * 2 / N;
+      double ph = qAtan2(sumimag, sumreal);
+      QVector2D p(ph, mag);
+      out.append(p);
+
+      if (mag > 0.000001)
+        {
+          result += format.arg(k).arg(mag).arg(ph);
+        }
+    }
+
+  ui->text->appendPlainText(result);
+}
+
+void MainWindow::on_pushButton_10_clicked()
+{
+  step = 1;
+  offset = inputs = 7;
+  eps = 0.0001;
+  speed = 0.0001;
+  weights.clear();
+  int woerrs = 0;
+  QDate begin = transactions.firstKey();
+
+  for (int i = 0; i < inputs; i++)
+    {
+      weights.append(QRandomGenerator::global()->generateDouble() * 2 - 1);
+    }
+
+  for (int trys = 0; trys < 1000000; trys++)
+    {
+      val.clear();
+
+      for (int i = 0; i < inputs; i++)
+        {
+          val.append(f(begin.addDays(i)) / 10000000);
+        }
+
+      for (int i = offset; i < N; i++)
+        {
+          pred = 0;
+
+          for (int j = 0; j < inputs; j++)
+            {
+              pred += val.at(j) * weights.at(j);
+            }
+
+          expected = f(begin.addDays(i)) / 10000000;
+          err = (expected - pred);
+
+          if (qAbs(err) < eps)
+            {
+              woerrs++;
+
+              if (woerrs == 3)
+                { return; }
+            }
+          else
+            { woerrs = 0; }
+
+          for (int j = 0; j < inputs; j++)
+            {
+              weights[j] += speed * err * val[j];
+            }
+
+          val.removeFirst();
+          val.append(expected);
+        }
+
+      setWindowTitle(QString::number(trys));
+    }
+
+  QMessageBox(QMessageBox::Warning, "Ошибка",
+              "Ой",
+              QMessageBox::Ok).exec();
+}
+
+void MainWindow::on_pushButton_11_clicked()
+{
+  pred = 0;
+  val.clear();
+  QDate end = transactions.lastKey();
+
+  for (int i = 0; i < inputs; i++)
+    {
+      val.append(f(end.addDays(-inputs + i + 1)));
+    }
+
+  for (int j = 0; j < inputs; j++)
+    {
+      pred += val.at(j) * weights.at(j);
+    }
+
+  QMessageBox(QMessageBox::Information, "Хммм",
+              QString::number(pred),
+              QMessageBox::Ok).exec();
 }
