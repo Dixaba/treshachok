@@ -26,10 +26,12 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    genann.c
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    genann.h
 
 FORMS += \
         mainwindow.ui

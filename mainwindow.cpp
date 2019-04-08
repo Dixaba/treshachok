@@ -6,20 +6,12 @@
 #include <QtMath>
 #include <QRandomGenerator>
 
+#include "genann.h"
 
+const int dddsdfasdadfasfg = 28;
 
-
-QList<double>weights;
-QList<double>val;
-int offset = 0;
-double expected, pred, err;
-int inputs;
-double eps;
-double speed;
-double step;
-
-
-
+genann *ann = nullptr;
+QVector<double *> ins, outs;
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -458,4 +450,102 @@ void MainWindow::on_pushButton_9_clicked()
     }
 
   ui->text->appendPlainText(result);
+}
+
+void MainWindow::on_toolButton_clicked()
+{
+  if (ann != nullptr)
+    {
+      genann_free(ann);
+      ann = nullptr;
+    }
+
+  ins.clear();
+  outs.clear();
+  int count = N - dddsdfasdadfasfg;
+  ann = genann_init(dddsdfasdadfasfg, dddsdfasdadfasfg / 2, 3, 1);
+  QDate begin = transactions.firstKey();
+
+  for (int i = 0; i < count; i++)
+    {
+      double *inputs = new double[dddsdfasdadfasfg];
+
+      for (int j = 0; j < dddsdfasdadfasfg; j++)
+        {
+          inputs[j] = qAbs(f(begin.addDays(i + j)) / 10000000);
+        }
+
+      ins.append(inputs);
+      double *output = new double;
+      *output = qAbs(f(begin.addDays(i + dddsdfasdadfasfg)) / 10000000);
+      outs.append(output);
+    }
+
+  for (int i = 0; i < 10000; i++)
+    {
+      for (int j = 0; j < count; j++)
+        {
+          genann_train(ann, ins[j], outs[j], 0.001);
+        }
+
+      setWindowTitle(QString::number(i));
+    }
+}
+
+void MainWindow::on_toolButton_2_clicked()
+{
+  QDate begin = transactions.firstKey();
+  double *ppppp = new double[dddsdfasdadfasfg];
+
+  for (int j = 0; j < dddsdfasdadfasfg; j++)
+    {
+      ppppp[j] = qAbs(f(begin.addDays(N - dddsdfasdadfasfg + 1 + j)) / 10000000);
+    }
+
+  double const *prediction = genann_run(ann, ppppp);
+  QMessageBox(QMessageBox::Information, "Хммм",
+              QString::number(*prediction * 10000000),
+              QMessageBox::Ok).exec();
+  delete[] ppppp;
+}
+
+void MainWindow::on_verticalSlider_valueChanged(int value)
+{
+  ui->ch1->chart()->removeAllSeries();
+  QVector<double> newIn;
+  auto lineIn = new QLineSeries();
+  lineIn->setColor(Qt::red);
+  auto line123 = new QLineSeries();
+  line123->setColor(Qt::blue);
+
+  for (int t = value / 2;
+       t < N - value / 2;
+       t++)
+    {
+      double  newVal = 0;
+
+      for (int x = 0; x < value; x++)
+        {
+          newVal += in[t + x - value / 2];
+        }
+
+      newVal /= value;
+      newIn.append(newVal);
+      lineIn->append(t, newVal);
+    }
+
+  for (int t = 0; t < N; t++)
+    {
+      line123->append(t, in[t]);
+    }
+
+  //  N -= value - 1;
+  //  in = newIn;
+  //  for (int i = 0; i < N; i++)
+  //    {
+  //      lineIn->append(i, in[i]);
+  //    }
+  ui->ch1->chart()->addSeries(line123);
+  ui->ch1->chart()->addSeries(lineIn);
+  ui->ch1->chart()->createDefaultAxes();
 }

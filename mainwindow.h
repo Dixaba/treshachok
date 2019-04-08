@@ -33,6 +33,9 @@ class MainWindow : public QMainWindow {
     void on_progress_valueChanged(int value);
     void on_pushButton_8_clicked();
     void on_pushButton_9_clicked();
+    void on_toolButton_clicked();
+    void on_toolButton_2_clicked();
+    void on_verticalSlider_valueChanged(int value);
 
   private:
     Ui::MainWindow *ui;
